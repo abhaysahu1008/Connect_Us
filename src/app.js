@@ -14,10 +14,20 @@ const app = express();
 //   res.send("Hellooooo");
 // });
 
-app.get("/get/:user/:pass", (req, res) => {
-  console.log(req.params);
+// middleware
+const { adminAuth, userAuth } = require("./middlewares/auth");
 
-  res.send({ name: "Abhay Sahu", city: "Jhansi" });
+app.use("/admin", adminAuth);
+
+app.get("/admin/getAllData", (req, res) => {
+  console.log("get all data");
+  res.send("Get All Data");
+});
+
+//we can also write like this
+app.get("/user/data", userAuth, (req, res) => {
+  console.log("get user data");
+  res.send("Get user Data");
 });
 
 app.listen(7777, () => {
