@@ -4,30 +4,22 @@ const express = require("express");
 
 const app = express();
 
-// app.get("/", (req, res) => {
-//   res.send("My Dashboard");
-// });
-// app.get("/get", (req, res) => {
-//   res.send("Hello World!!!!!!!!!");
-// });
-// app.get("/hey", (req, res) => {
-//   res.send("Hellooooo");
+// app.use("/", (req, res) => {
+//   try {
+//     throw new Error("bdhjej");
+//   } catch (error) {
+//     res.status(500).send("Something went wrong");
+//   }
 // });
 
-// middleware
-const { adminAuth, userAuth } = require("./middlewares/auth");
-
-app.use("/admin", adminAuth);
-
-app.get("/admin/getAllData", (req, res) => {
-  console.log("get all data");
-  res.send("Get All Data");
+app.get("/userData", (req, res) => {
+  throw new Error("kjnww");
 });
 
-//we can also write like this
-app.get("/user/data", userAuth, (req, res) => {
-  console.log("get user data");
-  res.send("Get user Data");
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("Something went wrong");
+  }
 });
 
 app.listen(7777, () => {
