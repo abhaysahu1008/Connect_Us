@@ -11,7 +11,14 @@ app.use(express.json());
 app.post("/signUp", async (req, res) => {
   console.log(req.body);
   const user = new User(req.body);
+  const emailId = req.body.emailId;
   try {
+    // const existingUser = await User.findOne({ emailId });
+
+    // if (existingUser) {
+    //   return res.status(400).send("Email already registered");
+    // }
+
     await user.save();
     // console.log("User created succesfully");
 
@@ -65,11 +72,11 @@ app.patch("/user", async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate({ _id: userId }, data, {
       new: true,
+      runValidators: true,
     });
     res.send(user + "User updated succesfully!!");
-    // console.log();
   } catch (error) {
-    res.status(400).send("Something went wrong");
+    res.status(400).send("Update failed" + error.message);
   }
 });
 
