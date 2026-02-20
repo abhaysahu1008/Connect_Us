@@ -1,14 +1,17 @@
 // console.log("hello World");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
 
 const express = require("express");
 const connectDb = require("./config/database");
 const User = require("./models/user");
 const { validateSignUpData } = require("./utils/validation");
+const { userAuth } = require("./middlewares/auth");
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signUp", async (req, res) => {
   console.log(req.body);
@@ -48,7 +51,25 @@ app.post("/login", async (req, res) => {
 
   const isValidPassword = await bcrypt.compare(password, user.password);
   if (isValidPassword) {
+    // res.cookie("token", "nedcuncuierhcuiheuicrh");
+    const token = await jwt.sign({ _id: user._id }, "Abhay@ConnectUs123", {
+      expiresIn: "1d",
+    });
+    res.cookie("token:", token, { maxAge: 3600000 });
+    console.log(token);
     res.send("Login successfull");
+  }
+});
+
+app.get("/profile", userAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw new Error("User not found!");
+    }
+    res.send(user);
+  } catch (error) {
+    res.status(400).send("Error : " + error.message);
   }
 });
 
