@@ -1,5 +1,4 @@
 // console.log("hello World");
-const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 
 const express = require("express");
@@ -49,13 +48,12 @@ app.post("/login", async (req, res) => {
     throw new Error("Invalid credentials");
   }
 
-  const isValidPassword = await bcrypt.compare(password, user.password);
+  const isValidPassword = await user.validatePassword(password);
+
   if (isValidPassword) {
     // res.cookie("token", "nedcuncuierhcuiheuicrh");
-    const token = await jwt.sign({ _id: user._id }, "Abhay@ConnectUs123", {
-      expiresIn: "1d",
-    });
-    res.cookie("token:", token, { maxAge: 3600000 });
+    const token = await user.getJWT();
+    res.cookie("token", token, { maxAge: 3600000 });
     console.log(token);
     res.send("Login successfull");
   }
