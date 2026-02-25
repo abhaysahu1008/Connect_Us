@@ -15,7 +15,7 @@ const connectionRequestSchema = new mongoose.Schema(
       required: true,
       enum: {
         values: ["accepted", "rejected", "ignore", "interested"],
-        message: `${value} is incorrect status type`,
+        message: `{VALUE} is incorrect status type`,
       },
     },
   },
@@ -29,4 +29,4 @@ const ConnectionRequestModel = new mongoose.model(
   connectionRequestSchema,
 );
 
-module.exports = ConnectionRequest;
+module.exports = ConnectionRequestModel;

@@ -1,46 +1,53 @@
 const express = require("express");
+const { userAuth } = require("../middlewares/auth");
+const mongoose = require("mongoose");
+const ConnectionRequestModel = require("../models/connectionRequest");
+const User = require("../models/user");
 const requestRouter = express.Router();
 
-const { userAuth } = require("../middlewares/auth");
-const ConnectionRequest = require("../models/connectionRequest");
-const User = require("../models/user");
-
-const sendEmail = require("../utils/sendEmail");
-
 requestRouter.post(
-  "/request/send/:status/:toUserId",
+  "/request/send/:status/:userId",
   userAuth,
   async (req, res) => {
     try {
       const fromUserId = req.user._id;
-      const toUserId = req.params.toUserId;
+      const toUserId = req.params.userId;
       const status = req.params.status;
 
-      const allowedStatus = ["ignored", "interested"];
+      const allowedStatus = ["ignore", "interested"];
+
       if (!allowedStatus.includes(status)) {
-        return res
-          .status(400)
-          .json({ message: "Invalid status type: " + status });
+        return res.status(400).send(`${status} is invalid`);
       }
 
-      const toUser = await User.findById(toUserId);
-      if (!toUser) {
-        return res.status(404).json({ message: "User not found!" });
+      if (fromUserId.equals(toUserId)) {
+        return res.status(400).send("You cannot send request to yourself");
       }
 
-      const existingConnectionRequest = await ConnectionRequest.findOne({
+      const userId = await User.findById({ _id: toUserId });
+
+      if (!userId) {
+        res.status(400).send({ message: "Cannot send request to this user!" });
+      }
+
+      const existingRequest = await ConnectionRequestModel.findOne({
         $or: [
-          { fromUserId, toUserId },
-          { fromUserId: toUserId, toUserId: fromUserId },
+          {
+            fromUserId,
+            toUserId,
+          },
+          {
+            fromUserId: toUserId,
+            toUserId: fromUserId,
+          },
         ],
       });
-      if (existingConnectionRequest) {
-        return res
-          .status(400)
-          .send({ message: "Connection Request Already Exists!!" });
+
+      if (existingRequest) {
+        return res.status(400).send("Request already exists");
       }
 
-      const connectionRequest = new ConnectionRequest({
+      const connectionRequest = new ConnectionRequestModel({
         fromUserId,
         toUserId,
         status,
@@ -48,19 +55,14 @@ requestRouter.post(
 
       const data = await connectionRequest.save();
 
-      // const emailRes = await sendEmail.run(
-      //   "A new friend request from " + req.user.firstName,
-      //   req.user.firstName + " is " + status + " in " + toUser.firstName
-      // );
-      // console.log(emailRes);
-
       res.json({
-        message:
-          req.user.firstName + " is " + status + " in " + toUser.firstName,
+        message: "Request sent!",
         data,
       });
     } catch (err) {
-      res.status(400).send("ERROR: " + err.message);
+      res.status(500).send("Error: " + err.message);
     }
   },
 );
+
+module.exports = requestRouter;
