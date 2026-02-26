@@ -14,6 +14,10 @@ requestRouter.post(
       const toUserId = req.params.userId;
       const status = req.params.status;
 
+      if (!mongoose.Types.ObjectId.isValid(toUserId)) {
+        return res.status(400).send("Invalid userId");
+      }
+
       const allowedStatus = ["ignore", "interested"];
 
       if (!allowedStatus.includes(status)) {
@@ -24,22 +28,18 @@ requestRouter.post(
         return res.status(400).send("You cannot send request to yourself");
       }
 
-      const userId = await User.findById({ _id: toUserId });
+      const toUser = await User.findById(toUserId);
 
-      if (!userId) {
-        res.status(400).send({ message: "Cannot send request to this user!" });
+      if (!toUser) {
+        return res.status(400).send({
+          message: "Cannot send request to this user!",
+        });
       }
 
       const existingRequest = await ConnectionRequestModel.findOne({
         $or: [
-          {
-            fromUserId,
-            toUserId,
-          },
-          {
-            fromUserId: toUserId,
-            toUserId: fromUserId,
-          },
+          { fromUserId, toUserId },
+          { fromUserId: toUserId, toUserId: fromUserId },
         ],
       });
 
