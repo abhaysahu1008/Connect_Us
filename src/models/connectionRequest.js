@@ -30,13 +30,9 @@ connectionRequestSchema.index({
 });
 
 connectionRequestSchema.pre("save", function (next) {
-  const ConnectionRequest = this;
-  if (ConnectionRequest.fromUserId.equals(ConnectionRequest.userId)) {
-    res.status(400).send({
-      message: "Cannot send requset to yourself!",
-    });
+  if (this.fromUserId.equals(this.toUserId)) {
+    throw new Error("Cannot send request to yourself!");
   }
-  next();
 });
 
 const ConnectionRequestModel = new mongoose.model(

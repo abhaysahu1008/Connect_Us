@@ -16,6 +16,11 @@ authRouter.post("/signUp", async (req, res) => {
     const { firstName, lastName, emailId, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const existingUser = await User.findOne({ emailId: emailId });
+
+    if (existingUser) {
+      return res.status(400).send({ message: "User already exists!" });
+    }
     const user = new User({
       firstName,
       lastName,
@@ -46,6 +51,8 @@ authRouter.post("/login", async (req, res) => {
     const token = await user.getJWT();
     res.cookie("token", token, { maxAge: 3600000 });
     res.send("Login successfull");
+  } else {
+    return res.status(400).send({ mesaage: "Invalid password!" });
   }
 });
 
