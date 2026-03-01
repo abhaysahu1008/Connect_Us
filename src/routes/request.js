@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const ConnectionRequestModel = require("../models/connectionRequest");
 const User = require("../models/user");
 const requestRouter = express.Router();
+const USER_SAFE_DATA = "firstName lastName ";
 
 requestRouter.post(
   "/request/send/:status/:userId",
@@ -82,7 +83,7 @@ requestRouter.post(
         _id: requestId,
         status: "interested",
         toUserId: loggedInUser._id,
-      });
+      }).populate("fromUserId toUserId", USER_SAFE_DATA);
 
       if (!connectionRequest) {
         return res

@@ -2,9 +2,10 @@ const mongoose = require("mongoose");
 const express = require("express");
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequestModel = require("../models/connectionRequest");
+const User = require("../models/user");
 const userRouter = express.Router();
 
-const USER_SAFE_DATA = "firstName lastName age gender skills";
+const USER_SAFE_DATA = "firstName lastName age gender skills photoUrl about";
 
 userRouter.get("/user/requests/recieved", userAuth, async (req, res) => {
   try {
@@ -50,4 +51,40 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
   }
 });
 
+userRouter.get("/feed", userAuth, async (req, res) => {
+  const loggedInUser = req.user;
+  const AllConnections = await ConnectionRequestModel.find({
+    $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+  }).select("fromUserId toUserId");
+  // .populate("fromUserId", "firstName lastName")
+  // .populate("toUserId", "firstName lastName");
+
+  const hideUsersFromFeed = new Set();
+
+  AllConnections.forEach((req) => {
+    hideUsersFromFeed.add(req.fromUserId.toString());
+    hideUsersFromFeed.add(req.toUserId.toString());
+  });
+
+  // console.log(hideUsersFromFeed);
+  const users = await User.find({
+    $and: [
+      {
+        _id: { $nin: Array.from(hideUsersFromFeed) },
+      },
+      {
+        _id: { $ne: loggedInUser._id },
+      },
+    ],
+  }).select(USER_SAFE_DATA);
+
+  res.send(users);
+});
+
 module.exports = userRouter;
+
+//not to be shown on user feed
+// -there own Profile
+// -ignored Profile
+// -accepted Profile
+// -interested Profile
