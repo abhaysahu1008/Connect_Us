@@ -50,7 +50,7 @@ authRouter.post("/login", async (req, res) => {
   if (isValidPassword) {
     const token = await user.getJWT();
     res.cookie("token", token, { maxAge: 3600000 });
-    res.send("Login successfull");
+    res.json({ message: "Login Successfull", data: user });
   } else {
     return res.status(400).send({ mesaage: "Invalid password!" });
   }
