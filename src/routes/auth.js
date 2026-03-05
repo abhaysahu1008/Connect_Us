@@ -42,7 +42,7 @@ authRouter.post("/login", async (req, res) => {
   const user = await User.findOne({ emailId: emailId });
 
   if (!user) {
-    throw new Error("Invalid credentials");
+    return res.status(400).json({ message: "Invalid credentials" });
   }
 
   const isValidPassword = await user.validatePassword(password);
@@ -52,7 +52,7 @@ authRouter.post("/login", async (req, res) => {
     res.cookie("token", token, { maxAge: 3600000 });
     res.json({ message: "Login Successfull", data: user });
   } else {
-    return res.status(400).send({ mesaage: "Invalid password!" });
+    return res.status(400).send({ message: "Invalid password!" });
   }
 });
 
