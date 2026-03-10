@@ -6,7 +6,7 @@ const User = require("../models/user");
 const requestRouter = express.Router();
 const USER_SAFE_DATA = "firstName lastName ";
 
-const sendEmail = require("../utils/sendEmail.js");
+// const sendEmail = require("../utils/sendEmail.js");
 
 requestRouter.post(
   "/request/send/:status/:userId",
@@ -58,8 +58,8 @@ requestRouter.post(
 
       const data = await connectionRequest.save();
 
-      const emailRes = await sendEmail.run();
-      console.log("Email Result:", emailRes);
+      // const emailRes = await sendEmail.run();
+      // console.log("Email Result:", emailRes);
 
       res.json({
         message: "Request sent!",
