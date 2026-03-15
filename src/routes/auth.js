@@ -43,7 +43,7 @@ authRouter.post("/signUp", async (req, res) => {
     });
 
     await user.save();
-    console.log(user);
+    // console.log(user);
 
     res.status(201).json({
       message: "User created successfully",
