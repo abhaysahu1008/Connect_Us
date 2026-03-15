@@ -11,7 +11,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://devzoo.in"],
+    origin: [
+      "http://localhost:5173",
+      "https://devzoo.in",
+      "http://52.66.203.187",
+    ],
 
     credentials: true,
   }),
