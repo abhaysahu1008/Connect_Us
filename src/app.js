@@ -5,6 +5,8 @@ const cookieParser = require("cookie-parser");
 
 const connectDb = require("./config/database");
 const cors = require("cors");
+
+require("./utils/cronjob");
 const app = express();
 
 app.use(express.json());
