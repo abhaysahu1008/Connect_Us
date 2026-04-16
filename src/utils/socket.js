@@ -59,7 +59,6 @@ const initializeSocket = (server) => {
 
           await chat.save();
 
-          console.log(firstName + " " + text);
           io.to(roomId).emit("messageReceived", { firstName, text, userId });
         } catch (error) {
           console.log(error);
