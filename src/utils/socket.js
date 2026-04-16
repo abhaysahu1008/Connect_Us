@@ -31,7 +31,7 @@ const initializeSocket = (server) => {
 
         try {
           const AlreadyFriends = await ConnectionRequestModel.findOne({
-            $OR: [
+            $or: [
               {
                 fromUserId: userId,
                 toUserId: targetUser,
@@ -40,6 +40,7 @@ const initializeSocket = (server) => {
               { fromUserId: targetUser, toUserId: userId },
             ],
           });
+          if (!AlreadyFriends) return;
 
           let chat = await Chats.findOne({
             participants: { $all: [userId, targetUser] },
@@ -56,10 +57,10 @@ const initializeSocket = (server) => {
             text,
           });
 
-          chat.save();
+          await chat.save();
 
           console.log(firstName + " " + text);
-          io.to(roomId).emit("messageRecieved", { firstName, text });
+          io.to(roomId).emit("messageReceived", { firstName, text, userId });
         } catch (error) {
           console.log(error);
         }
