@@ -13,9 +13,16 @@ const getCryptoRoomId = (userId, targetUser) => {
 const initializeSocket = (server) => {
   const io = socket(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: [
+        "http://localhost:5173",
+        "http://devzoo.in",
+        "http://www.devzoo.in"
+      ],
+      methods: ["GET", "POST"],
+      credentials: true
     },
   });
+};
 
   io.on("connection", (socket) => {
     socket.on("joinChat", ({ firstName, userId, targetUser }) => {
