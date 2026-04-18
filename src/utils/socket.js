@@ -15,8 +15,9 @@ const initializeSocket = (server) => {
     cors: {
       origin: [
         "http://localhost:5173",
-        "http://devzoo.in",
-        "http://www.devzoo.in"
+
+        "https://devzoo.in",
+        "https://www.devzoo.in"
       ],
       methods: ["GET", "POST"],
       credentials: true
